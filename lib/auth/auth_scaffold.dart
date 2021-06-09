@@ -13,10 +13,10 @@ class AuthScaffold extends StatelessWidget {
           backgroundColor: Colors.blue[250],
           title: Text(
             text,
-            style: TextStyle(color: Colors.black),
+            style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
-          elevation: 0.0,
+          // elevation: 0.0,
         ),
         backgroundColor: Colors.white,
         body: body);

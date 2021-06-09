@@ -62,18 +62,21 @@ class ConfigScreenState extends State<ConfigScreen>
                 );
               },
               child: Scaffold(
-                backgroundColor: Colors.blue,
+                backgroundColor: Colors.white,
                 body: Center(
                   child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.5,
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: Image(
-                      image:
-                          AssetImage('assets/images/splash_screen_light.jpg'),
-                      fit: BoxFit.cover,
-                      height: double.infinity,
-                      width: double.infinity,
-                      alignment: Alignment.center,
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image(
+                        image:
+                            AssetImage('assets/images/splash_screen_light.jpg'),
+                        fit: BoxFit.cover,
+                        height: double.infinity,
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                      ),
                     ),
                   ),
                 ),
