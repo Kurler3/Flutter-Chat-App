@@ -1,7 +1,11 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_chat_app/auth/auth_scaffold.dart';
+import 'package:firebase_chat_app/auth/auth_service.dart';
+import 'package:firebase_chat_app/tools/auth_tools.dart';
+import 'package:firebase_chat_app/tools/chat_app.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
   static const String route = '/register';
@@ -30,20 +34,30 @@ class _RegisterPageState extends State<RegisterPage> {
     });
   }
 
-  void _register() {
+  void _register() async {
     // Check if the data input is correct and the user is already existent.
     // If exists then output error dialog
     if (_formKey.currentState!.validate()) {
-      // Check if user exists in firebase
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Creating account...')));
+      // Output loading circle
+      AuthTools.showLoaderDialog(context);
 
       // Print the data inputed
       print(_emailController.value.text);
       print(_passwordController.value.text);
 
-      // Simulate firebase check on db
-      Future.delayed(Duration(seconds: 2));
+      // Create account
+      var res = await context.read<AuthenticationService>().signUp(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim());
+
+      // Remove loading circle when done
+      Navigator.pop(context);
+
+      // Check if creation of account was successful
+      if (res != ChatApp.SIGN_UP_SUCCESSFUL) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            AuthTools.errorSnackBar(ChatApp.SIGN_UP_FAILED_MESSAGE));
+      }
     } else {
       // Clear both inputs and show popup saying user doesn't exist
     }

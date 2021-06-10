@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_chat_app/tools/chat_app.dart';
 
 class AuthenticationService {
   final FirebaseAuth _firebaseAuth;
@@ -10,9 +11,9 @@ class AuthenticationService {
   Future<String> signIn(
       {required String email, required String password}) async {
     try {
-      var user = await _firebaseAuth.signInWithEmailAndPassword(
+      await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
-      return "Signed In";
+      return ChatApp.SIGN_IN_SUCCESSFUL;
     } on FirebaseAuthException catch (e) {
       return e.message!;
     }
@@ -21,11 +22,21 @@ class AuthenticationService {
   Future<String> signUp(
       {required String email, required String password}) async {
     try {
-      var user = await _firebaseAuth.createUserWithEmailAndPassword(
+      await _firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
-      return "Created";
+      return ChatApp.SIGN_UP_SUCCESSFUL;
     } on FirebaseAuthException catch (e) {
-      return e.message!;
+      return e.message.toString();
+    }
+  }
+
+  Future<String> signOut() async {
+    try {
+      await _firebaseAuth.signOut();
+
+      return ChatApp.SIGN_OUT_SUCCESSFUL;
+    } on FirebaseAuthException catch (e) {
+      return e.message.toString();
     }
   }
 }

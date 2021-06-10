@@ -2,7 +2,10 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_chat_app/auth/auth_scaffold.dart';
 import 'package:firebase_chat_app/auth/auth_service.dart';
 import 'package:firebase_chat_app/auth/register_page.dart';
+import 'package:firebase_chat_app/tools/chat_app.dart';
+import 'package:firebase_chat_app/tools/auth_tools.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +19,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+
+  bool _tryingToLogIn = true;
 
   // Initially password is obscure
   bool _obscureText = true;
@@ -132,22 +137,34 @@ class _LoginPageState extends State<LoginPage> {
                   height: 20,
                 ),
                 ElevatedButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     // Check if the data input is correct and the user exists.
                     // If exists then procced to home page and send the users data as an argument
                     if (_formKey.currentState!.validate()) {
-                      // Check if user exists in firebase and log in
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Trying to log in')));
+                      // launch loading circle as a dialog
+                      AuthTools.showLoaderDialog(context);
 
                       // Print the data inputed
                       print(_emailController.value.text);
                       print(_passwordController.value.text);
 
                       // Check on Firebase
-                      authentication.signIn(
+                      var res = await authentication.signIn(
                           email: _emailController.text.trim(),
                           password: _passwordController.text.trim());
+
+                      // Remove dialog
+                      Navigator.pop(context);
+
+                      // If there was an error show dialog saying there was an error, otherwise just goes in new home
+                      if (res != ChatApp.SIGN_IN_SUCCESSFUL) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            AuthTools.errorSnackBar(
+                                ChatApp.LOGIN_FAILED_MESSAGE));
+                      } else {
+                        // Direct user to a first time user page allowing him to upload an image and choose a username
+
+                      }
                     } else {
                       // Clear both inputs and show popup saying user doesn't exist
                     }
@@ -178,42 +195,42 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-class AuthInputField extends StatelessWidget {
-  final String text;
+// class AuthInputField extends StatelessWidget {
+//   final String text;
 
-  AuthInputField(this.text);
+//   AuthInputField(this.text);
 
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: text,
-        hintText: 'Enter your $text',
-        hintStyle: TextStyle(
-          color: Colors.purple,
-          fontStyle: FontStyle.italic,
-        ),
-        errorText: 'Oops, something went wrong!',
-        errorStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.blueAccent,
-          ),
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.grey,
-          ),
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.red,
-          ),
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return TextFormField(
+//       decoration: InputDecoration(
+//         labelText: text,
+//         hintText: 'Enter your $text',
+//         hintStyle: TextStyle(
+//           color: Colors.purple,
+//           fontStyle: FontStyle.italic,
+//         ),
+//         errorText: 'Oops, something went wrong!',
+//         errorStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+//         enabledBorder: OutlineInputBorder(
+//           borderSide: BorderSide(
+//             color: Colors.blueAccent,
+//           ),
+//           borderRadius: BorderRadius.circular(20.0),
+//         ),
+//         disabledBorder: OutlineInputBorder(
+//           borderSide: BorderSide(
+//             color: Colors.grey,
+//           ),
+//           borderRadius: BorderRadius.circular(20.0),
+//         ),
+//         errorBorder: OutlineInputBorder(
+//           borderSide: BorderSide(
+//             color: Colors.red,
+//           ),
+//           borderRadius: BorderRadius.circular(20.0),
+//         ),
+//       ),
+//     );
+//   }
+// }
