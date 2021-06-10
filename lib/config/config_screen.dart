@@ -101,7 +101,7 @@ class ConfigScreenState extends State<ConfigScreen>
             ));
           }
           if (currentState is InConfigState) {
-            // Return the auth widget instead
+            // Return the auth widget
             return LoginPage();
           }
           return Center(

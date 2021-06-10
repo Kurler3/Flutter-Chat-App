@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "711845356066",
+    "project_id": "chatty-f9349",
+    "storage_bucket": "chatty-f9349.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:711845356066:android:b77f6ecf0779d82df1207b",
+        "android_client_info": {
+          "package_name": "com.miguel.firebase_chat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "711845356066-jg66s31n612ucfa411k1c9pso3htrhqn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcY8eTBNHNjjHQl1lh-UgVVZcAaj1VKe0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "711845356066-jg66s31n612ucfa411k1c9pso3htrhqn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
