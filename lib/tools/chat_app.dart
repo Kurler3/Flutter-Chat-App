@@ -26,4 +26,27 @@ class ChatApp {
       "Couldn't logout. Try again, please!";
   static const String SIGN_UP_FAILED_MESSAGE =
       "Couldn't create account. Please try again";
+
+  // Register page text fields
+  // static const String REGISTER_FIRST_NAME = "REGISTER_FIRST_NAME";
+  // static const String REGISTER_LAST_NAME = "REGISTER_LAST_NAME";
+  // static const String REGISTER_PHONE_NUMBER = "REGISTER_PHONE_NUMBER";
+  // static const String REGISTER_EMAIL = "REGISTER_EMAIL";
+  // static const String REGISTER_PASSWORD = "REGISTER_PASSWORD";
+  // static const String REGISTER_CONFIRM_PASSWORD = "REGISTER_CONFIRM_PASSWORD";
+
+  // Register Page label and hint texts
+  static const String REGISTER_FIRST_NAME_LABEL = "First Name";
+  static const String REGISTER_FIRST_NAME_HINT = "Enter your first name";
+  static const String REGISTER_LAST_NAME_LABEL = "Last Name";
+  static const String REGISTER_LAST_NAME_HINT = "Enter your last name";
+  static const String REGISTER_PHONE_NUMBER_LABEL = "Mobile Number";
+  static const String REGISTER_PHONE_NUMBER_HINT = "Enter your mobile number";
+  static const String REGISTER_EMAIL_LABEL = "Email";
+  static const String REGISTER_EMAIL_HINT = "Enter your email";
+  static const String REGISTER_PASSWORD_LABEL = "Password";
+  static const String REGISTER_PASSWORD_HINT = "Enter your password";
+  static const String REGISTER_CONFIRM_PASSWORD_LABEL = "Confirm Password";
+  static const String REGISTER_CONFIRM_PASSWORD_HINT =
+      "Enter your password again";
 }

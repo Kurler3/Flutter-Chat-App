@@ -67,8 +67,7 @@ class _LoginPageState extends State<LoginPage> {
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Required!';
-                    }
-                    if (!EmailValidator.validate(value)) {
+                    } else if (!EmailValidator.validate(value)) {
                       return 'Please input a valid email';
                     }
                     return null;
@@ -109,7 +108,9 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: InputDecoration(
                     suffixIcon: IconButton(
                       icon: Icon(
-                        Icons.lock,
+                        _obscureText
+                            ? FontAwesomeIcons.lock
+                            : FontAwesomeIcons.unlock,
                       ),
                       onPressed: _toggle,
                     ),
@@ -161,12 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                         ScaffoldMessenger.of(context).showSnackBar(
                             AuthTools.errorSnackBar(
                                 ChatApp.LOGIN_FAILED_MESSAGE));
-                      } else {
-                        // Direct user to a first time user page allowing him to upload an image and choose a username
-
                       }
-                    } else {
-                      // Clear both inputs and show popup saying user doesn't exist
                     }
                   },
                   icon: Icon(FontAwesomeIcons.arrowRight),
