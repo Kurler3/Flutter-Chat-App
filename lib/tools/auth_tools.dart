@@ -31,4 +31,15 @@ class AuthTools {
       duration: Duration(seconds: 2),
     );
   }
+
+  static SnackBar successSnackBar(String message) {
+    return SnackBar(
+      backgroundColor: Colors.blue,
+      content: Text(
+        message,
+        style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
+      ),
+      duration: Duration(seconds: 2),
+    );
+  }
 }

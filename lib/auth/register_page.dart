@@ -1,14 +1,16 @@
 import 'dart:io';
-
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_chat_app/auth/auth_scaffold.dart';
 import 'package:firebase_chat_app/auth/auth_service.dart';
+import 'package:firebase_chat_app/data_storage/database.dart';
+import 'package:firebase_chat_app/data_storage/storage.dart';
 import 'package:firebase_chat_app/tools/auth_tools.dart';
 import 'package:firebase_chat_app/tools/chat_app.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_chat_app/user.dart';
 
 class RegisterPage extends StatefulWidget {
   static const String route = '/register';
@@ -21,6 +23,9 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+
+  // Istance to create random ids
+  // final _uuid = Uuid();
 
   // Initially password is obscure
   bool _obscureText = true;
@@ -67,7 +72,7 @@ class _RegisterPageState extends State<RegisterPage> {
       AuthTools.showLoaderDialog(context);
 
       // Create account
-      var res = await context.read<AuthenticationService>().signUp(
+      var user = await context.read<AuthenticationService>().signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim());
 
@@ -75,7 +80,7 @@ class _RegisterPageState extends State<RegisterPage> {
       Navigator.pop(context);
 
       // Check if creation of account was successful
-      if (res != ChatApp.SIGN_UP_SUCCESSFUL) {
+      if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
             AuthTools.errorSnackBar(ChatApp.SIGN_UP_FAILED_MESSAGE));
       } else {
@@ -83,6 +88,32 @@ class _RegisterPageState extends State<RegisterPage> {
         // If no image was uploaded then upload a custom anonymous one
         // Go back to the login page
 
+        PersonalizedUser newUser = new PersonalizedUser(
+            // v4 generates random Id, v1 generates time-based id
+            // uid: _uuid.v4(),
+            uid: user.uid,
+            profilePic: _image == null ? null : _image!.path,
+            firstName: _firstNameController.text,
+            lastName: _lastNameController.text,
+            email: _emailController.text,
+            password: _passwordController.text,
+            phoneNumber: _phoneNumberController.text);
+
+        // Save in the database
+        DatabaseTools().saveUser(newUser);
+
+        // Save profile pic to storage. If there's no pic then use the first letter of the first name instead
+        if (_image != null) Storage().uploadImageToFirebase(newUser, _image!);
+
+        // Show dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+            AuthTools.successSnackBar(ChatApp.SIGN_UP_SUCCESS_MESSAGE));
+
+        // Wait for 1 second
+        Future.delayed(Duration(seconds: 1));
+
+        // Enter home page
+        Navigator.pop(context);
       }
     }
   }
@@ -195,6 +226,18 @@ class _RegisterPageState extends State<RegisterPage> {
           if (isEmailField) {
             if (!EmailValidator.validate(value)) {
               return 'Please input a valid email';
+            }
+          }
+          if (isPasswordField) {
+            if (value.length < 6) {
+              return 'Password needs to be at least 6 characters long!';
+            }
+            if (controller == _passwordController) {
+              if (value != _confirmPasswordController.text)
+                return "Passwords don't match!";
+            } else {
+              if (value != _passwordController.text)
+                return "Passwords don't match";
             }
           }
           return null;

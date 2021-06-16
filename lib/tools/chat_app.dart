@@ -26,6 +26,7 @@ class ChatApp {
       "Couldn't logout. Try again, please!";
   static const String SIGN_UP_FAILED_MESSAGE =
       "Couldn't create account. Please try again";
+  static const String SIGN_UP_SUCCESS_MESSAGE = "Account created successfully!";
 
   // Register page text fields
   // static const String REGISTER_FIRST_NAME = "REGISTER_FIRST_NAME";
@@ -49,4 +50,6 @@ class ChatApp {
   static const String REGISTER_CONFIRM_PASSWORD_LABEL = "Confirm Password";
   static const String REGISTER_CONFIRM_PASSWORD_HINT =
       "Enter your password again";
+  static const String REGISTER_SUCCESSFUL_ADDED_USER_DATABASE =
+      "REGISTER_SUCCESSFUL_ADDED_USER_DATABASE";
 }
