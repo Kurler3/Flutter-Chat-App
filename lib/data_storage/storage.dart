@@ -30,9 +30,14 @@ class Storage {
   }
 
   Future<String?> getImageFromFirebase(String id) async {
-    firebase_storage.Reference profilePic = firebase_storage
-        .FirebaseStorage.instance
-        .ref()
-        .child('profilePics/$id');
+    try {
+      return await firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('profilePics/$id')
+          .getDownloadURL();
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
   }
 }

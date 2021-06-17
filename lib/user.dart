@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 @JsonSerializable()
@@ -10,6 +11,7 @@ class PersonalizedUser {
   final String password;
   final String phoneNumber;
   late String? profilePicDownloadUrl;
+  late Color? avatarBackgroundColor;
 
   PersonalizedUser(
       {required this.uid,

@@ -52,4 +52,11 @@ class ChatApp {
       "Enter your password again";
   static const String REGISTER_SUCCESSFUL_ADDED_USER_DATABASE =
       "REGISTER_SUCCESSFUL_ADDED_USER_DATABASE";
+
+  // Colors
+  static List AVATAR_BACKGROUND_COLORS = [
+    Colors.red,
+    Colors.amber,
+    Colors.brown[400]
+  ];
 }

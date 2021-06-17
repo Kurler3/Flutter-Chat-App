@@ -146,6 +146,7 @@ class _RegisterPageState extends State<RegisterPage> {
               height: 20,
             ),
             _textFieldWidget(
+                TextInputType.name,
                 _firstNameController,
                 ChatApp.REGISTER_FIRST_NAME_LABEL,
                 ChatApp.REGISTER_FIRST_NAME_HINT,
@@ -155,6 +156,7 @@ class _RegisterPageState extends State<RegisterPage> {
               height: 15,
             ),
             _textFieldWidget(
+                TextInputType.name,
                 _lastNameController,
                 ChatApp.REGISTER_LAST_NAME_LABEL,
                 ChatApp.REGISTER_LAST_NAME_HINT,
@@ -163,12 +165,18 @@ class _RegisterPageState extends State<RegisterPage> {
             SizedBox(
               height: 15,
             ),
-            _textFieldWidget(_emailController, ChatApp.REGISTER_EMAIL_LABEL,
-                ChatApp.REGISTER_EMAIL_HINT, true, false),
+            _textFieldWidget(
+                TextInputType.emailAddress,
+                _emailController,
+                ChatApp.REGISTER_EMAIL_LABEL,
+                ChatApp.REGISTER_EMAIL_HINT,
+                true,
+                false),
             SizedBox(
               height: 15,
             ),
             _textFieldWidget(
+                TextInputType.phone,
                 _phoneNumberController,
                 ChatApp.REGISTER_PHONE_NUMBER_LABEL,
                 ChatApp.REGISTER_PHONE_NUMBER_HINT,
@@ -178,6 +186,7 @@ class _RegisterPageState extends State<RegisterPage> {
               height: 15,
             ),
             _textFieldWidget(
+                TextInputType.text,
                 _passwordController,
                 ChatApp.REGISTER_PASSWORD_LABEL,
                 ChatApp.REGISTER_PASSWORD_HINT,
@@ -187,6 +196,7 @@ class _RegisterPageState extends State<RegisterPage> {
               height: 15,
             ),
             _textFieldWidget(
+                TextInputType.text,
                 _confirmPasswordController,
                 ChatApp.REGISTER_CONFIRM_PASSWORD_LABEL,
                 ChatApp.REGISTER_CONFIRM_PASSWORD_HINT,
@@ -213,11 +223,17 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _textFieldWidget(TextEditingController controller, String labelText,
-      String hintText, bool isEmailField, bool isPasswordField) {
+  Widget _textFieldWidget(
+      TextInputType typeInput,
+      TextEditingController controller,
+      String labelText,
+      String hintText,
+      bool isEmailField,
+      bool isPasswordField) {
     return Container(
       height: 55,
       child: TextFormField(
+        keyboardType: typeInput,
         controller: controller,
         validator: (value) {
           if (value!.isEmpty) {

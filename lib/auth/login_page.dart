@@ -63,6 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 SizedBox(height: 60.0),
                 TextFormField(
+                  keyboardType: TextInputType.emailAddress,
                   controller: _emailController,
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -97,6 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 20,
                 ),
                 TextFormField(
+                  keyboardType: TextInputType.text,
                   controller: _passwordController,
                   validator: (value) {
                     if (value!.isEmpty) {

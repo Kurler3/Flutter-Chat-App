@@ -64,7 +64,6 @@ class _ConfigPageState extends State<ConfigPage> {
             ),
           ),
           home: AuthenticationWrapper(),
-          // home: ConfigScreen(_configBloc),
           routes: {
             LoginPage.route: (context) => LoginPage(),
             RegisterPage.route: (context) => RegisterPage(),

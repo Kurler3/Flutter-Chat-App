@@ -1,68 +1,74 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_app/auth/auth_service.dart';
 import 'package:firebase_chat_app/data_storage/database.dart';
+import 'package:firebase_chat_app/home/conversations_page.dart';
+import 'package:firebase_chat_app/home/drawer_selection.dart';
+import 'package:firebase_chat_app/home/home_scaffold.dart';
 import 'package:firebase_chat_app/tools/auth_tools.dart';
 import 'package:firebase_chat_app/tools/chat_app.dart';
 import 'package:firebase_chat_app/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
-  static final String route = "/home";
+  static final String route = "/conversations";
   final User _user;
 
   HomePage(this._user);
 
   @override
-  _HomePageState createState() => _HomePageState(_user);
+  _HomePageState createState() => _HomePageState(_user.uid);
 }
 
 class _HomePageState extends State<HomePage> {
-  final User _user;
-  late final PersonalizedUser? _personalizedUser;
+  final String _userID;
 
-  _HomePageState(this._user);
-
-  @override
-  void initState() async {
-    super.initState();
-
-    // Search for PersonalizedUser in the database
-    _personalizedUser = await DatabaseTools().getUser(_user.uid);
-  }
+  _HomePageState(this._userID);
 
   @override
   Widget build(BuildContext context) {
-    // If _personalizedUser is null then it wasn't found in the database, which means there's an error.
-    // Display an error dialog, wait for 2 seconds and log the user out
+    return FutureBuilder<PersonalizedUser>(
+        future: DatabaseTools().getUser(_userID),
+        builder: (ctx, snapshot) {
+          // Checking if future is resolved or not
+          if (snapshot.connectionState == ConnectionState.done) {
+            // If we got an error
+            if (snapshot.hasError) {
+              return Scaffold(
+                body: Center(
+                  child: Text(
+                    '${snapshot.error} occured',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              );
 
-    AuthenticationService _authService = context.read<AuthenticationService>();
+              // if we got our data
+            } else if (snapshot.hasData) {
+              // Extracting data from snapshot object
+              final personalizedUser = snapshot.data!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(ChatApp.app_name),
-        centerTitle: true,
-      ),
-      body: Container(
-        child: Center(
-          child: ElevatedButton(
-            child: Text('Logout'),
-            onPressed: () async {
-              // Output loading circle
-              AuthTools.showLoaderDialog(context);
-              // Sign out
-              String res = await _authService.signOut();
-              // Remove loading circle
-              Navigator.pop(context);
-              // Output alert saying it wasn't possible if err
-              if (res != ChatApp.SIGN_OUT_SUCCESSFUL) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    AuthTools.errorSnackBar(ChatApp.LOGOUT_FAILED_MESSAGE));
-              }
-            },
-          ),
-        ),
-      ),
-    );
+              return _home(personalizedUser);
+            }
+          }
+
+          // Displaying LoadingSpinner to indicate waiting state
+          return Scaffold(
+            body: Center(
+              child: SpinKitFadingCircle(
+                color: Colors.blue,
+                size: 50.0,
+              ),
+            ),
+          );
+        });
+  }
+
+  Widget _home(PersonalizedUser personalizedUser) {
+    return ConversationsPage(personalizedUser);
   }
 }
