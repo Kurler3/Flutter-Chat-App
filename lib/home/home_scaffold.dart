@@ -1,14 +1,18 @@
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_chat_app/auth/auth_service.dart';
 import 'package:firebase_chat_app/home/contacts_page.dart';
 import 'package:firebase_chat_app/home/conversations_page.dart';
 import 'package:firebase_chat_app/home/drawer_selection.dart';
 import 'package:firebase_chat_app/home/home_page.dart';
+import 'package:firebase_chat_app/home/profile_page.dart';
+import 'package:firebase_chat_app/home/search_page.dart';
 import 'package:firebase_chat_app/tools/auth_tools.dart';
 import 'package:firebase_chat_app/tools/chat_app.dart';
 import 'package:firebase_chat_app/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -58,9 +62,9 @@ class _HomeScaffoldState extends State<HomeScaffold> {
             backgroundColor: personalizedUser.profilePicDownloadUrl == null
                 ? personalizedUser.avatarBackgroundColor
                 : null,
-            backgroundImage: personalizedUser.profilePicDownloadUrl != null
-                ? NetworkImage(personalizedUser.profilePicDownloadUrl!)
-                : null,
+            // backgroundImage: personalizedUser.profilePicDownloadUrl != null
+            //     ? NetworkImage(personalizedUser.profilePicDownloadUrl!)
+            //     : null,
             child: personalizedUser.profilePicDownloadUrl == null
                 ? Center(
                     child: Text(
@@ -71,7 +75,23 @@ class _HomeScaffoldState extends State<HomeScaffold> {
                           fontWeight: FontWeight.bold),
                     ),
                   )
-                : null,
+                : CachedNetworkImage(
+                    imageUrl: personalizedUser.profilePicDownloadUrl!,
+                    imageBuilder: (context, imageProvider) => Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                                image: imageProvider, fit: BoxFit.cover),
+                          ),
+                        ),
+                    placeholder: (context, url) => new SpinKitFadingCircle(
+                          color: Colors.white,
+                          size: 40.0,
+                        ),
+                    errorWidget: (context, url, error) =>
+                        new Icon(Icons.error)),
           ),
         ),
         ListTile(
@@ -127,7 +147,17 @@ class _HomeScaffoldState extends State<HomeScaffold> {
             style: TextStyle(fontSize: 14),
           ),
           leading: Icon(FontAwesomeIcons.search),
-          onTap: () {},
+          onTap: () {
+            // Check if already in the page selected
+            if (drawerSelection != DrawerSelection.search) {
+              // Navigate to selected
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => SearchPage(user)));
+            } else {
+              // Just pop the drawer back
+              Navigator.pop(context);
+            }
+          },
         ),
         Divider(
           color: Colors.blue[200],
@@ -139,7 +169,17 @@ class _HomeScaffoldState extends State<HomeScaffold> {
             style: TextStyle(fontSize: 14),
           ),
           leading: Icon(FontAwesomeIcons.userCircle),
-          onTap: () {},
+          onTap: () {
+            // Check if already in the page selected
+            if (drawerSelection != DrawerSelection.profile) {
+              // Navigate to selected
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => ProfilePage(user)));
+            } else {
+              // Just pop the drawer back
+              Navigator.pop(context);
+            }
+          },
         ),
         Divider(
           color: Colors.blue[200],

@@ -35,7 +35,8 @@ class DatabaseTools {
           lastName: element.get('last_name'),
           email: element.get('email'),
           password: element.get('password'),
-          phoneNumber: element.get('phone_number'));
+          phoneNumber: element.get('phone_number'),
+          friends: element.get('friends'));
     });
 
     // Acess Storage for the users profile pic and add it to the instance if it exists, otherwise make it null
@@ -48,5 +49,52 @@ class DatabaseTools {
     }
 
     return user;
+  }
+
+  Future<List<PersonalizedUser>> getUsers(String? term) async {
+    late QuerySnapshot usersSnapshot;
+
+    if (term == null) {
+      usersSnapshot = await users.get();
+    } else {
+      usersSnapshot = await users
+          .where('first_name', isGreaterThanOrEqualTo: term)
+          .where('first_name', isLessThan: term + 'z')
+          .where('last_name', isGreaterThanOrEqualTo: term)
+          .where('last_name', isLessThan: term + 'z')
+          .get();
+    }
+
+    List<PersonalizedUser> usersList =
+        await Future.wait(usersFromSnapshot(usersSnapshot));
+
+    print(usersList);
+
+    return usersList;
+  }
+
+  Iterable<Future<PersonalizedUser>> usersFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((element) async {
+      PersonalizedUser user = new PersonalizedUser(
+          uid: element.get('id'),
+          firstName: element.get('first_name'),
+          lastName: element.get('last_name'),
+          email: element.get('email'),
+          password: element.get('password'),
+          phoneNumber: element.get('phone_number'),
+          friends: element.get('friends'));
+
+      // Acess Storage for the users profile pic and add it to the instance if it exists, otherwise make it null
+      user.profilePicDownloadUrl =
+          await Storage().getImageFromFirebase(user.uid);
+
+      // If the user didn't choose an image then select a random color for his avatar background
+      if (user.profilePicDownloadUrl == null) {
+        user.avatarBackgroundColor = ChatApp.AVATAR_BACKGROUND_COLORS[
+            Random().nextInt(ChatApp.AVATAR_BACKGROUND_COLORS.length)];
+      }
+
+      return user;
+    });
   }
 }

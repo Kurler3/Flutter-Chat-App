@@ -97,7 +97,8 @@ class _RegisterPageState extends State<RegisterPage> {
             lastName: _lastNameController.text,
             email: _emailController.text,
             password: _passwordController.text,
-            phoneNumber: _phoneNumberController.text);
+            phoneNumber: _phoneNumberController.text,
+            friends: []);
 
         // Save in the database
         DatabaseTools().saveUser(newUser);

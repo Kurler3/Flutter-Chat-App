@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_chat_app/auth/auth_service.dart';
 import 'package:firebase_chat_app/data_storage/database.dart';
 import 'package:firebase_chat_app/home/conversations_page.dart';
 import 'package:firebase_chat_app/home/drawer_selection.dart';
