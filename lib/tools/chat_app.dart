@@ -24,6 +24,7 @@ class ChatApp {
       "Inputted data incorrect. Try again!";
   static const String LOGOUT_FAILED_MESSAGE =
       "Couldn't logout. Try again, please!";
+  static const String LOGOUT_SUCCESS_MESSAGE = "Logged out successfully";
   static const String SIGN_UP_FAILED_MESSAGE =
       "Couldn't create account. Please try again";
   static const String SIGN_UP_SUCCESS_MESSAGE = "Account created successfully!";

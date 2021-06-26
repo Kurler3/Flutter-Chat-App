@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,6 +30,13 @@ class DatabaseTools {
     late PersonalizedUser user;
 
     userSnapshot.docs.forEach((element) {
+      List<PersonalizedUser>? friendList =
+          json.decode(element.get('friends')).length >= 1
+              ? List<PersonalizedUser>.from(json
+                  .decode(element.get('friends'))
+                  .map((friend) => PersonalizedUser.fromJson(friend)))
+              : [];
+
       user = new PersonalizedUser(
           uid: element.get('id'),
           firstName: element.get('first_name'),
@@ -36,7 +44,7 @@ class DatabaseTools {
           email: element.get('email'),
           password: element.get('password'),
           phoneNumber: element.get('phone_number'),
-          friends: element.get('friends'));
+          friends: friendList);
     });
 
     // Acess Storage for the users profile pic and add it to the instance if it exists, otherwise make it null
@@ -51,30 +59,43 @@ class DatabaseTools {
     return user;
   }
 
+  Stream<QuerySnapshot> getUserStream() {
+    return users.snapshots();
+  }
+
   Future<List<PersonalizedUser>> getUsers(String? term) async {
     late QuerySnapshot usersSnapshot;
 
-    if (term == null) {
-      usersSnapshot = await users.get();
-    } else {
-      usersSnapshot = await users
-          .where('first_name', isGreaterThanOrEqualTo: term)
-          .where('first_name', isLessThan: term + 'z')
-          .where('last_name', isGreaterThanOrEqualTo: term)
-          .where('last_name', isLessThan: term + 'z')
-          .get();
-    }
+    usersSnapshot = await users.get();
 
     List<PersonalizedUser> usersList =
         await Future.wait(usersFromSnapshot(usersSnapshot));
 
-    print(usersList);
+    // Use filter to filter the users list if the user searched for something
+    if (term != null) {
+      usersList = usersList
+          .where((element) =>
+              element.firstName.contains(term) ||
+              element.lastName.contains(term))
+          .toList();
+    }
+
+    // usersList.forEach((element) {
+    //   print('${element.firstName} ${element.lastName}');
+    // });
 
     return usersList;
   }
 
   Iterable<Future<PersonalizedUser>> usersFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((element) async {
+      List<PersonalizedUser>? friendList =
+          json.decode(element.get('friends')).length >= 1
+              ? List<PersonalizedUser>.from(json
+                  .decode(element.get('friends'))
+                  .map((friend) => PersonalizedUser.fromJson(friend)))
+              : [];
+
       PersonalizedUser user = new PersonalizedUser(
           uid: element.get('id'),
           firstName: element.get('first_name'),
@@ -82,7 +103,7 @@ class DatabaseTools {
           email: element.get('email'),
           password: element.get('password'),
           phoneNumber: element.get('phone_number'),
-          friends: element.get('friends'));
+          friends: friendList);
 
       // Acess Storage for the users profile pic and add it to the instance if it exists, otherwise make it null
       user.profilePicDownloadUrl =

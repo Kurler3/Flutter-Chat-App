@@ -24,7 +24,7 @@ class _SearchBarState extends State<SearchBar> {
 
   // Full list of search history
   // Since will be pushing to the bottom then will have to reserve list later
-  List<String> _searchHistory = ['Adam', 'Peter'];
+  List<String> _searchHistory = [];
 
   // The list that will appear in the UI
   List<String> filteredSearchHistory = [];

@@ -28,23 +28,67 @@ class _SearchPageState extends State<SearchPage> implements Searchable {
   final currentLoggedUser;
   String? _term;
 
+  late Future<List<PersonalizedUser>> _userList;
+
   _SearchPageState(this.currentLoggedUser);
+
+  @override
+  void initState() {
+    super.initState();
+    _userList = DatabaseTools().getUsers(_term);
+  }
 
   @override
   Widget build(BuildContext context) {
     return HomeScaffold(
-        currentLoggedUser, 'Search', _searchHome(), DrawerSelection.search);
+        currentLoggedUser, 'Search', _usersList(), DrawerSelection.search);
   }
 
-  Widget _searchHome() {
-    return _usersList(_term);
-  }
+  // Widget _usersList() {
+  //   return StreamBuilder<QuerySnapshot>(
+  //       stream: DatabaseTools().getUserStream(),
+  //       builder: (ctx, snapshot) {
+  //         if (snapshot.connectionState != ConnectionState.done) {
+  //           return Center(
+  //             child: SpinKitFadingCircle(
+  //               color: Colors.blue,
+  //               size: 50.0,
+  //             ),
+  //           );
+  //         }
 
-  Widget _usersList(String? term) {
+  //         if (snapshot.connectionState == ConnectionState.done) {
+  //           if (snapshot.hasData) {
+
+  //             List<QueryDocumentSnapshot> users = snapshot.data!.docs;
+
+  //             // List<PersonalizedUser> usersList =
+  //             //   await Future.wait(usersFromSnapshot(usersSnapshot));
+
+  //           } else if (snapshot.hasError) {
+  //             return Center(
+  //               child: Text(
+  //                 '${snapshot.error} occured',
+  //                 style: TextStyle(fontSize: 18),
+  //               ),
+  //             );
+  //           }
+  //         }
+
+  //         return Center(
+  //           child: Text(
+  //             'No Users Found :(',
+  //             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  //           ),
+  //         );
+  //       });
+  // }
+
+  Widget _usersList() {
     return FutureBuilder<List<PersonalizedUser>>(
-        future: DatabaseTools().getUsers(term),
+        future: _userList,
         builder: (ctx, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState != ConnectionState.done) {
             return Center(
               child: SpinKitFadingCircle(
                 color: Colors.blue,
@@ -53,43 +97,64 @@ class _SearchPageState extends State<SearchPage> implements Searchable {
             );
           }
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                '${snapshot.error} occured',
-                style: TextStyle(fontSize: 18),
-              ),
-            );
+          // snapshot.hasData and snapshot.hasError aren't reset until new data comes
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData) {
+              List<PersonalizedUser> users = snapshot.data!;
+
+              // Will print everytime the list changes, or so I hope lmao
+              users.forEach((element) {
+                print('${element.firstName} ${element.lastName}');
+              });
+
+              return SearchBar(
+                  this,
+                  'Search for people...',
+                  ListView.separated(
+                    separatorBuilder: (BuildContext context, int index) =>
+                        Divider(height: 1),
+                    padding: const EdgeInsets.only(top: 60),
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (ctx, index) {
+                      return SizedBox(
+                          height: 60,
+                          child: SearchUserListTile(
+                            key: Key(users[index].uid),
+                            currentLoggedUser: currentLoggedUser,
+                            userFromList: users[index],
+                          ));
+                    },
+                  ));
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  '${snapshot.error} occured',
+                  style: TextStyle(fontSize: 18),
+                ),
+              );
+            }
           }
 
-          List<PersonalizedUser> users = snapshot.data!;
-
-          return SearchBar(
-              this,
-              'Search for people...',
-              ListView.separated(
-                separatorBuilder: (BuildContext context, int index) =>
-                    Divider(height: 1),
-                padding: const EdgeInsets.only(top: 60),
-                itemCount: snapshot.data!.length,
-                itemBuilder: (ctx, index) {
-                  return SizedBox(
-                      height: 60,
-                      child: SearchUserListTile(
-                        key: Key(users[index].uid),
-                        currentLoggedUser: currentLoggedUser,
-                        userFromList: users[index],
-                      ));
-                },
-              ));
+          // If there's no users in the database, which will never happen actually
+          return Center(
+            child: Text(
+              'No Users Found :(',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          );
         });
   }
 
   // Will make the widget rebuild everytime the term is updated
   @override
   void search(String? term) {
+    print('interface is working');
+
+    // Should make the whole screen rebuild but it isn't working
     setState(() {
-      _term = term;
+      _userList = DatabaseTools().getUsers(term);
     });
   }
 }

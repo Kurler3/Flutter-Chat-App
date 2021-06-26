@@ -29,18 +29,22 @@ class PersonalizedUser {
       required this.phoneNumber,
       required this.friends});
 
-  factory PersonalizedUser.fromJson(Map<String, dynamic> json) =>
+  factory PersonalizedUser.fromJson(Map<String, dynamic> jsonObject) =>
       PersonalizedUser(
-          uid: json['id'] as String,
-          profilePic: json['profile_pic'] == null
+          uid: jsonObject['id'] as String,
+          profilePic: jsonObject['profile_pic'] == null
               ? null
-              : json['profile_pic'] as String,
-          firstName: json['first_name'] as String,
-          lastName: json['last_name'] as String,
-          email: json['email'] as String,
-          password: json['password'] as String,
-          phoneNumber: json['phone_number'] as String,
-          friends: json['friends'] as List<PersonalizedUser>);
+              : jsonObject['profile_pic'] as String,
+          firstName: jsonObject['first_name'] as String,
+          lastName: jsonObject['last_name'] as String,
+          email: jsonObject['email'] as String,
+          password: jsonObject['password'] as String,
+          phoneNumber: jsonObject['phone_number'] as String,
+
+          // Method to deserialize from json to List of objects
+          friends: List<PersonalizedUser>.from(json
+              .decode(jsonObject['friends'])
+              .map((friend) => PersonalizedUser.fromJson(friend))));
 
   Map<String, dynamic> toJson() {
     return {

@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_app/auth/auth_service.dart';
+import 'package:firebase_chat_app/auth/login_page.dart';
 import 'package:firebase_chat_app/home/contacts_page.dart';
 import 'package:firebase_chat_app/home/conversations_page.dart';
 import 'package:firebase_chat_app/home/drawer_selection.dart';
@@ -36,17 +38,24 @@ class _HomeScaffoldState extends State<HomeScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        centerTitle: true,
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.add_comment))],
-      ),
-      drawer: Drawer(
-        child: drawerList(user),
-      ),
-      body: home,
-    );
+    // If the user is not null then go straight to whatever page this is
+    User? firebaseUser = context.watch<User?>();
+
+    return firebaseUser != null
+        ? Scaffold(
+            appBar: AppBar(
+              title: Text(title),
+              centerTitle: true,
+              actions: [
+                IconButton(onPressed: () {}, icon: Icon(Icons.add_comment))
+              ],
+            ),
+            drawer: Drawer(
+              child: drawerList(user),
+            ),
+            body: home,
+          )
+        : LoginPage();
   }
 
   Widget drawerList(PersonalizedUser personalizedUser) {
@@ -78,8 +87,8 @@ class _HomeScaffoldState extends State<HomeScaffold> {
                 : CachedNetworkImage(
                     imageUrl: personalizedUser.profilePicDownloadUrl!,
                     imageBuilder: (context, imageProvider) => Container(
-                          width: 60,
-                          height: 60,
+                          width: 70,
+                          height: 70,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
@@ -207,6 +216,9 @@ class _HomeScaffoldState extends State<HomeScaffold> {
     if (res != ChatApp.SIGN_OUT_SUCCESSFUL) {
       ScaffoldMessenger.of(context)
           .showSnackBar(AuthTools.errorSnackBar(ChatApp.LOGOUT_FAILED_MESSAGE));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          AuthTools.successSnackBar(ChatApp.LOGOUT_SUCCESS_MESSAGE));
     }
   }
 }
