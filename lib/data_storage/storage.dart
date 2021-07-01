@@ -23,10 +23,6 @@ class Storage {
     firebase_storage.TaskSnapshot taskSnapshot = await uploadTask
         .whenComplete(() => print("Added image to storage"))
         .catchError((e) => print(e));
-
-    await taskSnapshot.ref.getDownloadURL().then(
-          (value) => user.profilePicDownloadUrl = value,
-        );
   }
 
   Future<String?> getImageFromFirebase(String id) async {

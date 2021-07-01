@@ -30,92 +30,42 @@ class DatabaseTools {
     late PersonalizedUser user;
 
     userSnapshot.docs.forEach((element) {
-      List<PersonalizedUser>? friendList =
-          json.decode(element.get('friends')).length >= 1
-              ? List<PersonalizedUser>.from(json
-                  .decode(element.get('friends'))
-                  .map((friend) => PersonalizedUser.fromJson(friend)))
-              : [];
-
-      user = new PersonalizedUser(
-          uid: element.get('id'),
-          firstName: element.get('first_name'),
-          lastName: element.get('last_name'),
-          email: element.get('email'),
-          password: element.get('password'),
-          phoneNumber: element.get('phone_number'),
-          friends: friendList);
+      Map<String, dynamic> userJson = element.data() as Map<String, dynamic>;
+      user = PersonalizedUser.fromJson(userJson);
     });
-
-    // Acess Storage for the users profile pic and add it to the instance if it exists, otherwise make it null
-    user.profilePicDownloadUrl = await Storage().getImageFromFirebase(user.uid);
-
-    // If the user didn't choose an image then select a random color for his avatar background
-    if (user.profilePicDownloadUrl == null) {
-      user.avatarBackgroundColor = ChatApp.AVATAR_BACKGROUND_COLORS[
-          Random().nextInt(ChatApp.AVATAR_BACKGROUND_COLORS.length)];
-    }
 
     return user;
   }
 
-  Stream<QuerySnapshot> getUserStream() {
-    return users.snapshots();
-  }
-
-  Future<List<PersonalizedUser>> getUsers(String? term) async {
-    late QuerySnapshot usersSnapshot;
-
-    usersSnapshot = await users.get();
-
-    List<PersonalizedUser> usersList =
-        await Future.wait(usersFromSnapshot(usersSnapshot));
-
-    // Use filter to filter the users list if the user searched for something
-    if (term != null) {
-      usersList = usersList
-          .where((element) =>
-              element.firstName.contains(term) ||
-              element.lastName.contains(term))
-          .toList();
-    }
-
-    // usersList.forEach((element) {
-    //   print('${element.firstName} ${element.lastName}');
-    // });
-
-    return usersList;
+  Future<List<PersonalizedUser>> getUsers() async {
+    QuerySnapshot usersSnapshot = await users.get();
+    return await Future.wait(usersFromSnapshot(usersSnapshot));
   }
 
   Iterable<Future<PersonalizedUser>> usersFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((element) async {
-      List<PersonalizedUser>? friendList =
-          json.decode(element.get('friends')).length >= 1
-              ? List<PersonalizedUser>.from(json
-                  .decode(element.get('friends'))
-                  .map((friend) => PersonalizedUser.fromJson(friend)))
-              : [];
-
-      PersonalizedUser user = new PersonalizedUser(
-          uid: element.get('id'),
-          firstName: element.get('first_name'),
-          lastName: element.get('last_name'),
-          email: element.get('email'),
-          password: element.get('password'),
-          phoneNumber: element.get('phone_number'),
-          friends: friendList);
-
-      // Acess Storage for the users profile pic and add it to the instance if it exists, otherwise make it null
-      user.profilePicDownloadUrl =
-          await Storage().getImageFromFirebase(user.uid);
-
-      // If the user didn't choose an image then select a random color for his avatar background
-      if (user.profilePicDownloadUrl == null) {
-        user.avatarBackgroundColor = ChatApp.AVATAR_BACKGROUND_COLORS[
-            Random().nextInt(ChatApp.AVATAR_BACKGROUND_COLORS.length)];
-      }
-
-      return user;
+      Map<String, dynamic> data = element.data() as Map<String, dynamic>;
+      return PersonalizedUser.fromJson(data);
     });
+  }
+
+  Future<List<PersonalizedUser>> getFriendUsers(
+      PersonalizedUser currentUser) async {
+    return currentUser.friends;
+  }
+
+  Future<String> updateUsersFriendList(PersonalizedUser user) async {
+    try {
+      users.where('id', isEqualTo: user.uid).get().then((querySnapshot) {
+        querySnapshot.docs.forEach((documentSnapshot) {
+          documentSnapshot.reference
+              .update({'friends': jsonEncode(user.friends)});
+        });
+      });
+
+      return ChatApp.UPDATE_FRIENDS_LIST_SUCCESSFUL;
+    } catch (e) {
+      return e.toString();
+    }
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_chat_app/auth/auth_scaffold.dart';
 import 'package:firebase_chat_app/auth/auth_service.dart';
@@ -100,11 +101,24 @@ class _RegisterPageState extends State<RegisterPage> {
             phoneNumber: _phoneNumberController.text,
             friends: []);
 
-        // Save in the database
-        DatabaseTools().saveUser(newUser);
-
         // Save profile pic to storage. If there's no pic then use the first letter of the first name instead
         if (_image != null) Storage().uploadImageToFirebase(newUser, _image!);
+
+        // Acess Storage for the users profile pic and add it to the instance if it exists, otherwise make it null
+        newUser.profilePicDownloadUrl =
+            await Storage().getImageFromFirebase(user.uid);
+
+        // If the user didn't choose an image then select a random color for his avatar background
+        if (newUser.profilePicDownloadUrl == null) {
+          newUser.avatarBackgroundColor = ChatApp.AVATAR_BACKGROUND_COLORS[
+              Random().nextInt(ChatApp.AVATAR_BACKGROUND_COLORS.length)];
+        }
+
+        print(newUser.profilePicDownloadUrl);
+        print(newUser.avatarBackgroundColor);
+
+        // Save in the database
+        DatabaseTools().saveUser(newUser);
 
         // Show dialog
         ScaffoldMessenger.of(context).showSnackBar(

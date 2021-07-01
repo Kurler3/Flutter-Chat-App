@@ -29,6 +29,16 @@ class ChatApp {
       "Couldn't create account. Please try again";
   static const String SIGN_UP_SUCCESS_MESSAGE = "Account created successfully!";
 
+  // Database
+  static const String UPDATE_FRIENDS_LIST_SUCCESSFUL =
+      "UPDATE_FRIENDS_LIST_SUCCESSFUL";
+
+  // Searching Page Widget
+
+  static const String SEARCHING_PEOPLE_PAGE = "SEARCHING_PEOPLE_PAGE";
+  static const String SEARCHING_FRIENDS_PAGE = "SEARCHING_FRIENDS_PAGE";
+  static const String NEW_CONVERSATION_PAGE = "NEW_CONVERSATION_PAGE";
+
   // Register page text fields
   // static const String REGISTER_FIRST_NAME = "REGISTER_FIRST_NAME";
   // static const String REGISTER_LAST_NAME = "REGISTER_LAST_NAME";

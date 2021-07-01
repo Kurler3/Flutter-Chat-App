@@ -8,6 +8,7 @@ import 'package:firebase_chat_app/home/contacts_page.dart';
 import 'package:firebase_chat_app/home/conversations_page.dart';
 import 'package:firebase_chat_app/home/drawer_selection.dart';
 import 'package:firebase_chat_app/home/home_page.dart';
+import 'package:firebase_chat_app/home/new_conversation_page.dart';
 import 'package:firebase_chat_app/home/profile_page.dart';
 import 'package:firebase_chat_app/home/search_page.dart';
 import 'package:firebase_chat_app/tools/auth_tools.dart';
@@ -47,7 +48,16 @@ class _HomeScaffoldState extends State<HomeScaffold> {
               title: Text(title),
               centerTitle: true,
               actions: [
-                IconButton(onPressed: () {}, icon: Icon(Icons.add_comment))
+                IconButton(
+                    onPressed: () {
+                      // Pushes to the page to create a new conversation
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  NewConversationPage(currentUser: user)));
+                    },
+                    icon: Icon(Icons.add_comment))
               ],
             ),
             drawer: Drawer(

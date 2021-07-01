@@ -63,6 +63,7 @@ class _ConfigPageState extends State<ConfigPage> {
               elevation: 0.0,
             ),
           ),
+          debugShowCheckedModeBanner: false,
           home: AuthenticationWrapper(),
           routes: {
             LoginPage.route: (context) => LoginPage(),
