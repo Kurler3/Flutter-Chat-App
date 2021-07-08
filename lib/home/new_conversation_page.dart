@@ -1,5 +1,3 @@
-import 'package:firebase_chat_app/home/home_scaffold.dart';
-import 'package:firebase_chat_app/home/search_page.dart';
 import 'package:firebase_chat_app/home/searching_page_widget.dart';
 import 'package:firebase_chat_app/tools/chat_app.dart';
 import 'package:firebase_chat_app/user.dart';

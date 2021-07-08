@@ -32,6 +32,7 @@ class ChatApp {
   // Database
   static const String UPDATE_FRIENDS_LIST_SUCCESSFUL =
       "UPDATE_FRIENDS_LIST_SUCCESSFUL";
+  static const String CREATE_CONVO_SUCCESSFUL = 'CREATE_CONVO_SUCCESSFUL';
 
   // Searching Page Widget
 

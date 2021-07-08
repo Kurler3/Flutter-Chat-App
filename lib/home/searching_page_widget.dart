@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_chat_app/data_storage/database.dart';
+import 'package:firebase_chat_app/home/conversation_page.dart';
 import 'package:firebase_chat_app/home/search_bar.dart';
 import 'package:firebase_chat_app/tools/chat_app.dart';
 import 'package:firebase_chat_app/user.dart';
@@ -203,6 +204,25 @@ class _UserListTileState extends State<UserListTile> {
 
     return ListTile(
       key: widget.key,
+      onTap: () {
+        // Opens the conversation page with this user
+        // If this is clicked while on the new conversation page, then use pushReplacement
+        // else use push
+
+        if (_typePage == ChatApp.NEW_CONVERSATION_PAGE) {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ConversationPage(
+                      userFrom: _currentLoggedUser, userTo: _userFromList)));
+        } else {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ConversationPage(
+                      userFrom: _currentLoggedUser, userTo: _userFromList)));
+        }
+      },
       leading: Padding(
         padding: const EdgeInsets.only(top: 6.0),
         child: CircleAvatar(

@@ -13,6 +13,7 @@ import 'package:firebase_chat_app/home/profile_page.dart';
 import 'package:firebase_chat_app/home/search_page.dart';
 import 'package:firebase_chat_app/tools/auth_tools.dart';
 import 'package:firebase_chat_app/tools/chat_app.dart';
+import 'package:firebase_chat_app/tools/helper_functions.dart';
 import 'package:firebase_chat_app/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -76,42 +77,7 @@ class _HomeScaffoldState extends State<HomeScaffold> {
           accountName: Text(
               personalizedUser.firstName + " " + personalizedUser.lastName),
           accountEmail: Text(personalizedUser.email),
-          currentAccountPicture: CircleAvatar(
-            radius: 50.0,
-            backgroundColor: personalizedUser.profilePicDownloadUrl == null
-                ? personalizedUser.avatarBackgroundColor
-                : null,
-            // backgroundImage: personalizedUser.profilePicDownloadUrl != null
-            //     ? NetworkImage(personalizedUser.profilePicDownloadUrl!)
-            //     : null,
-            child: personalizedUser.profilePicDownloadUrl == null
-                ? Center(
-                    child: Text(
-                      personalizedUser.firstName[0],
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  )
-                : CachedNetworkImage(
-                    imageUrl: personalizedUser.profilePicDownloadUrl!,
-                    imageBuilder: (context, imageProvider) => Container(
-                          width: 70,
-                          height: 70,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                                image: imageProvider, fit: BoxFit.cover),
-                          ),
-                        ),
-                    placeholder: (context, url) => new SpinKitFadingCircle(
-                          color: Colors.white,
-                          size: 40.0,
-                        ),
-                    errorWidget: (context, url, error) =>
-                        new Icon(Icons.error)),
-          ),
+          currentAccountPicture: getUserCircleAvatar(personalizedUser, 50),
         ),
         ListTile(
           selected: drawerSelection == DrawerSelection.conversations,
