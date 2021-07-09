@@ -33,8 +33,8 @@ class _ConversationsPageState extends State<ConversationsPage> {
   }
 
   Widget _conversationsHome() {
-    return FutureBuilder<QuerySnapshot>(
-      future: DatabaseTools().getConversationsFuture(user),
+    return StreamBuilder<QuerySnapshot>(
+      stream: DatabaseTools().getConversationsStream(user),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Center(
@@ -48,7 +48,7 @@ class _ConversationsPageState extends State<ConversationsPage> {
         if (snapshot.hasData) {
           final List<Conversation> conversations = snapshot.data!.docs
               .map((DocumentSnapshot doc) => Conversation.fromFirestore(doc))
-              .where((convo) => convo.users[0].uid == user.uid)
+              // .where((convo) => convo.users[0].uid == user.uid)
               .toList();
 
           return ConversationsBody(
@@ -138,11 +138,16 @@ class _ConversationsBodyState extends State<ConversationsBody> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       getUserCircleAvatar(
-                          _conversationsList[index].users[1], 22),
+                          isCurrentUserDisplay(
+                                  _currentUser, _conversationsList[index])
+                              ? _conversationsList[index].users[1]
+                              : _conversationsList[index].users[0],
+                          22),
                       SizedBox(
                         height: 5,
                       ),
-                      Text('${_conversationsList[index].users[1].firstName}')
+                      Text(
+                          '${isCurrentUserDisplay(_currentUser, _conversationsList[index]) ? _conversationsList[index].users[1].firstName : _conversationsList[index].users[0].firstName}')
                     ],
                   ),
                 );
@@ -164,6 +169,7 @@ class _ConversationsBodyState extends State<ConversationsBody> {
                 return SizedBox(
                     height: 60,
                     child: ConversationListTile(
+                      key: Key(filteredConversationsList[index].uid),
                       currentUser: _currentUser,
                       conversation: filteredConversationsList[index],
                     ));
@@ -215,7 +221,7 @@ class ConversationListTile extends StatefulWidget {
 }
 
 class _ConversationListTileState extends State<ConversationListTile> {
-  late final Conversation _conversation;
+  late Conversation _conversation;
   late final PersonalizedUser _currentUser;
 
   @override
@@ -226,15 +232,32 @@ class _ConversationListTileState extends State<ConversationListTile> {
   }
 
   @override
+  void didUpdateWidget(covariant ConversationListTile oldWidget) {
+    if (_conversation.lastMessage['timestamp'] !=
+        widget.conversation.lastMessage['timestamp']) {
+      setState(() {
+        _conversation = widget.conversation;
+      });
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: getUserCircleAvatar(_conversation.users[1], 20),
+      leading: getUserCircleAvatar(
+          isCurrentUserDisplay(_currentUser, _conversation)
+              ? _conversation.users[1]
+              : _conversation.users[0],
+          20),
       title: Text(
-        '${_conversation.users[1].firstName} ${_conversation.users[1].lastName}',
+        isCurrentUserDisplay(_currentUser, _conversation)
+            ? '${_conversation.users[1].firstName} ${_conversation.users[1].lastName}'
+            : '${_conversation.users[0].firstName} ${_conversation.users[0].lastName}',
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       subtitle: Text(
-        '${_conversation.lastMessage['userFrom'] == _conversation.users[0] ? 'You :' : ''}${_conversation.lastMessage['content']} - ${readTimestamp(_conversation.lastMessage['timestamp'])}',
+        '${_conversation.lastMessage['userFrom']['id'] == _currentUser.uid ? 'You : ' : ''}${_conversation.lastMessage['content']} - ${readTimestamp(_conversation.lastMessage['timestamp'])}',
         style: _conversation.lastMessage['read'] == false &&
                 _conversation.lastMessage['userTo']['id'] == _currentUser.uid
             ? TextStyle(color: Colors.black)
@@ -253,8 +276,10 @@ class _ConversationListTileState extends State<ConversationListTile> {
             context,
             MaterialPageRoute(
                 builder: (context) => ConversationPage(
-                    userFrom: _conversation.users[0],
-                    userTo: _conversation.users[1])));
+                    userFrom: _currentUser,
+                    userTo: _currentUser.uid == _conversation.users[0].uid
+                        ? _conversation.users[1]
+                        : _conversation.users[0])));
       },
     );
   }

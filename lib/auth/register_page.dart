@@ -99,6 +99,7 @@ class _RegisterPageState extends State<RegisterPage> {
             email: _emailController.text,
             password: _passwordController.text,
             phoneNumber: _phoneNumberController.text,
+            // phoneNumber: _phoneNumberController.text,
             friends: []);
 
         // Save profile pic to storage. If there's no pic then use the first letter of the first name instead
@@ -270,6 +271,10 @@ class _RegisterPageState extends State<RegisterPage> {
               if (value != _passwordController.text)
                 return "Passwords don't match";
             }
+          }
+
+          if (controller == _phoneNumberController && value.length < 11) {
+            return "Phone number has to have 11 digits!";
           }
           return null;
         },

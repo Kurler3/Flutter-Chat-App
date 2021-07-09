@@ -106,12 +106,26 @@ class DatabaseTools {
         .snapshots();
   }
 
-  void updateMessageRead(doc, convoID) {
+  void updateMessageRead(DocumentSnapshot doc, convoID) async {
+    // Conversation reference
+    final DocumentReference convoDocReference = messages.doc(convoID);
+
+    // Conversation snapshot
+    final DocumentSnapshot convoReference = await messages.doc(convoID).get();
+
+    // Message reference
     final DocumentReference documentReference =
-        messages.doc(convoID).collection(convoID).doc(doc.documentID);
+        messages.doc(convoID).collection(convoID).doc(doc.id);
 
     documentReference
         .set(<String, dynamic>{'read': true}, SetOptions(merge: true));
+
+    // If this message was the last one
+    if (doc.id == convoReference['lastMessage']['timestamp']) {
+      convoDocReference.set({
+        'lastMessage': {'read': true}
+      }, SetOptions(merge: true));
+    }
   }
 
   void sendMessage(
@@ -155,11 +169,11 @@ class DatabaseTools {
     });
   }
 
-  Future<QuerySnapshot> getConversationsFuture(
-      PersonalizedUser userFrom) async {
-    return await messages
+  Stream<QuerySnapshot> getConversationsStream(
+      PersonalizedUser userFrom) async* {
+    yield* messages
         .where('users', arrayContains: userFrom.toJson())
         .orderBy('lastMessage.timestamp', descending: true)
-        .get();
+        .snapshots();
   }
 }

@@ -141,10 +141,6 @@ class _ChatScreenState extends State<ChatScreen> {
       stream: DatabaseTools().getConversationStream(_convoID),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          snapshot.data!.docs.forEach((element) {
-            print('${element['content']}');
-          });
-
           return ListView.builder(
             padding: const EdgeInsets.all(10.0),
             itemBuilder: (BuildContext context, int index) =>
@@ -224,6 +220,10 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           children: <Widget>[
             Row(children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 20, left: 5),
+                child: getUserCircleAvatar(_userTo, 19),
+              ),
               Container(
                 child: Bubble(
                     color: Colors.grey[200],
@@ -234,13 +234,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       document['content'],
                       style: TextStyle(color: Colors.black),
                     )),
-                width: 200.0,
                 margin: const EdgeInsets.only(left: 10.0),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20, left: 5),
-                child: getUserCircleAvatar(_userTo, 19),
-              )
             ])
           ],
           crossAxisAlignment: CrossAxisAlignment.start,

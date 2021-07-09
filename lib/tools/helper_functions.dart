@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_chat_app/conversation.dart';
 import 'package:firebase_chat_app/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -73,3 +74,6 @@ String readTimestamp(String timestamp) {
 
   return time;
 }
+
+bool isCurrentUserDisplay(PersonalizedUser currentUser, Conversation convo) =>
+    currentUser.uid == convo.users[0].uid;
