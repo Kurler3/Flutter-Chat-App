@@ -27,12 +27,13 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return HomeScaffold(
-        currentLoggedUser,
-        'Search',
-        SearchBody(
+        key: UniqueKey(),
+        user: currentLoggedUser,
+        title: 'Search',
+        home: SearchBody(
           currentUser: currentLoggedUser,
           typePage: ChatApp.SEARCHING_PEOPLE_PAGE,
         ),
-        DrawerSelection.search);
+        drawerSelection: DrawerSelection.search);
   }
 }

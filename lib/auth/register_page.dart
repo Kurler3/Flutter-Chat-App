@@ -103,7 +103,8 @@ class _RegisterPageState extends State<RegisterPage> {
             friends: []);
 
         // Save profile pic to storage. If there's no pic then use the first letter of the first name instead
-        if (_image != null) Storage().uploadImageToFirebase(newUser, _image!);
+        if (_image != null)
+          await Storage().uploadImageToFirebase(newUser, _image!);
 
         // Acess Storage for the users profile pic and add it to the instance if it exists, otherwise make it null
         newUser.profilePicDownloadUrl =

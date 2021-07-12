@@ -42,6 +42,7 @@ class _SearchBodyState extends State<SearchBody> {
 
           if (snapshot.hasData) {
             return UserList(
+                key: UniqueKey(),
                 currentUser: _currentUser,
                 usersList: snapshot.data!,
                 typePage: _typePage);

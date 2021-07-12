@@ -28,8 +28,12 @@ class _ConversationsPageState extends State<ConversationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return HomeScaffold(user, 'Conversations', _conversationsHome(),
-        DrawerSelection.conversations);
+    return HomeScaffold(
+        key: UniqueKey(),
+        user: user,
+        title: 'Conversations',
+        home: _conversationsHome(),
+        drawerSelection: DrawerSelection.conversations);
   }
 
   Widget _conversationsHome() {
@@ -52,6 +56,7 @@ class _ConversationsPageState extends State<ConversationsPage> {
               .toList();
 
           return ConversationsBody(
+            key: UniqueKey(),
             currentUser: user,
             conversationsList: conversations,
           );
@@ -87,24 +92,25 @@ class ConversationsBody extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ConversationsBodyState createState() => _ConversationsBodyState();
+  _ConversationsBodyState createState() => _ConversationsBodyState(
+      currentUser: currentUser, conversationsList: conversationsList);
 }
 
 class _ConversationsBodyState extends State<ConversationsBody> {
-  late final List<Conversation> _conversationsList;
-  late final PersonalizedUser _currentUser;
+  final List<Conversation> conversationsList;
+  final PersonalizedUser currentUser;
 
   List<Conversation> filteredConversationsList = [];
 
   TextEditingController _searchController = TextEditingController();
   String? _term;
 
+  _ConversationsBodyState(
+      {required this.currentUser, required this.conversationsList});
+
   @override
   void initState() {
     super.initState();
-    _conversationsList = widget.conversationsList;
-    _currentUser = widget.currentUser;
-
     _searchController.addListener(_searchListener);
     searchConversationsList();
   }
@@ -123,7 +129,7 @@ class _ConversationsBodyState extends State<ConversationsBody> {
               shrinkWrap: true,
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               scrollDirection: Axis.horizontal,
-              itemCount: _conversationsList.length,
+              itemCount: conversationsList.length,
               itemBuilder: (context, index) {
                 return InkWell(
                   onTap: () {
@@ -131,23 +137,23 @@ class _ConversationsBodyState extends State<ConversationsBody> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => ConversationPage(
-                                userFrom: _conversationsList[index].users[0],
-                                userTo: _conversationsList[index].users[1])));
+                                userFrom: conversationsList[index].users[0],
+                                userTo: conversationsList[index].users[1])));
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       getUserCircleAvatar(
                           isCurrentUserDisplay(
-                                  _currentUser, _conversationsList[index])
-                              ? _conversationsList[index].users[1]
-                              : _conversationsList[index].users[0],
+                                  currentUser, conversationsList[index])
+                              ? conversationsList[index].users[1]
+                              : conversationsList[index].users[0],
                           22),
                       SizedBox(
                         height: 5,
                       ),
                       Text(
-                          '${isCurrentUserDisplay(_currentUser, _conversationsList[index]) ? _conversationsList[index].users[1].firstName : _conversationsList[index].users[0].firstName}')
+                          '${isCurrentUserDisplay(currentUser, conversationsList[index]) ? conversationsList[index].users[1].firstName : conversationsList[index].users[0].firstName}')
                     ],
                   ),
                 );
@@ -170,7 +176,7 @@ class _ConversationsBodyState extends State<ConversationsBody> {
                     height: 60,
                     child: ConversationListTile(
                       key: Key(filteredConversationsList[index].uid),
-                      currentUser: _currentUser,
+                      currentUser: currentUser,
                       conversation: filteredConversationsList[index],
                     ));
               },
@@ -192,7 +198,7 @@ class _ConversationsBodyState extends State<ConversationsBody> {
   searchConversationsList() {
     setState(() {
       if (_term != null) {
-        filteredConversationsList = _conversationsList
+        filteredConversationsList = conversationsList
             .where((conversation) =>
                 conversation.users[1].firstName
                     .toLowerCase()
@@ -202,7 +208,7 @@ class _ConversationsBodyState extends State<ConversationsBody> {
                     .contains(_term!.toLowerCase()))
             .toList();
       } else {
-        filteredConversationsList = _conversationsList;
+        filteredConversationsList = conversationsList;
       }
     });
   }

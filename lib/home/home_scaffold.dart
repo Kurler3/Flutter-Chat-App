@@ -16,14 +16,18 @@ import 'package:firebase_chat_app/tools/chat_app.dart';
 import 'package:firebase_chat_app/tools/helper_functions.dart';
 import 'package:firebase_chat_app/user.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class HomeScaffold extends StatefulWidget {
   final user, title, home, drawerSelection;
 
-  HomeScaffold(this.user, this.title, this.home, this.drawerSelection);
+  HomeScaffold(
+      {Key? key,
+      required this.user,
+      required this.title,
+      required this.home,
+      required this.drawerSelection});
 
   @override
   _HomeScaffoldState createState() =>
@@ -46,7 +50,10 @@ class _HomeScaffoldState extends State<HomeScaffold> {
     return firebaseUser != null
         ? Scaffold(
             appBar: AppBar(
-              title: Text(title),
+              title: Text(
+                title,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               centerTitle: true,
               actions: [
                 IconButton(

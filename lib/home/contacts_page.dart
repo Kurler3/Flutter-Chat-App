@@ -22,12 +22,13 @@ class _ContactsPageState extends State<ContactsPage> {
   @override
   Widget build(BuildContext context) {
     return HomeScaffold(
-        currentUser,
-        'Contacts',
-        SearchBody(
+        key: UniqueKey(),
+        user: currentUser,
+        title: 'Contacts',
+        home: SearchBody(
           currentUser: currentUser,
           typePage: ChatApp.SEARCHING_FRIENDS_PAGE,
         ),
-        DrawerSelection.contacts);
+        drawerSelection: DrawerSelection.contacts);
   }
 }

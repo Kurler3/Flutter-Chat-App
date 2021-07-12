@@ -29,6 +29,12 @@ class DatabaseTools {
         .catchError((error) => print("Failed to add user: $error"));
   }
 
+  Future updateUser(PersonalizedUser user) async {
+    return await users
+        .doc(user.uid)
+        .update({"profile_pic_url": user.profilePicDownloadUrl});
+  }
+
   Future<PersonalizedUser> getUser(String id) async {
     QuerySnapshot userSnapshot = await users.where('id', isEqualTo: id).get();
     late PersonalizedUser user;

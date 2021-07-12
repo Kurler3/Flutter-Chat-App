@@ -25,6 +25,22 @@ class Storage {
         .catchError((e) => print(e));
   }
 
+  Future updateImageToFirebase(PersonalizedUser user, File imageFile) async {
+    // Delete the old profile image
+    await firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('profilePics/${user.uid}')
+        .delete();
+
+    // Save new one
+    await firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('profilePics/${user.uid}')
+        .putFile(imageFile)
+        .whenComplete(() => print("Updated Profile Image"))
+        .catchError((e) => print(e));
+  }
+
   Future<String?> getImageFromFirebase(String id) async {
     try {
       return await firebase_storage.FirebaseStorage.instance
