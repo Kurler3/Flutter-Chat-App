@@ -49,7 +49,7 @@ Widget getUserCircleAvatar(PersonalizedUser personalizedUser, double radius) {
 String readTimestamp(String timestamp) {
   var now = DateTime.now();
   var format = DateFormat('HH:mm a');
-  var date = DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp) * 1000);
+  var date = DateTime.fromMicrosecondsSinceEpoch(int.parse(timestamp) * 1000);
   var diff = now.difference(date);
   var time = '';
 

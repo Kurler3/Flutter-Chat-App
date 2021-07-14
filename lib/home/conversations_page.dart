@@ -28,15 +28,45 @@ class _ConversationsPageState extends State<ConversationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return HomeScaffold(
-        key: UniqueKey(),
-        user: user,
-        title: 'Conversations',
-        home: _conversationsHome(),
-        drawerSelection: DrawerSelection.conversations);
+    return StreamBuilder<DocumentSnapshot>(
+      stream: DatabaseTools().getUserStream(user.uid),
+      builder: (ctx, snapshot) {
+        if (!snapshot.hasData) {
+          return Scaffold(
+            body: Center(
+              child: SpinKitFadingCircle(
+                color: Colors.blue,
+                size: 50.0,
+              ),
+            ),
+          );
+        }
+
+        if (snapshot.hasData) {
+          PersonalizedUser updatedUser = PersonalizedUser.fromJson(
+              snapshot.data!.data() as Map<String, dynamic>);
+
+          return HomeScaffold(
+              key: UniqueKey(),
+              user: updatedUser,
+              title: 'Conversations',
+              home: _conversationsHome(updatedUser),
+              drawerSelection: DrawerSelection.conversations);
+        }
+
+        return Scaffold(
+          body: Center(
+            child: Text(
+              '${snapshot.error} occured',
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  Widget _conversationsHome() {
+  Widget _conversationsHome(PersonalizedUser user) {
     return StreamBuilder<QuerySnapshot>(
       stream: DatabaseTools().getConversationsStream(user),
       builder: (context, snapshot) {

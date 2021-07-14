@@ -1,33 +1,34 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_chat_app/data_storage/database.dart';
 import 'package:firebase_chat_app/data_storage/storage.dart';
 import 'package:firebase_chat_app/home/account_details_page.dart';
 import 'package:firebase_chat_app/home/drawer_selection.dart';
 import 'package:firebase_chat_app/home/home_scaffold.dart';
+import 'package:firebase_chat_app/home/profile_interface.dart';
 import 'package:firebase_chat_app/home/settings_page.dart';
 import 'package:firebase_chat_app/tools/auth_tools.dart';
 import 'package:firebase_chat_app/tools/helper_functions.dart';
 import 'package:firebase_chat_app/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfilePage extends StatefulWidget {
   static const String route = 'profile';
 
-  PersonalizedUser currentUser;
+  final PersonalizedUser currentUser;
 
   ProfilePage(this.currentUser);
 
   @override
-  _ProfilePageState createState() =>
-      _ProfilePageState(currentUser: currentUser);
+  _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  PersonalizedUser currentUser;
-
-  _ProfilePageState({required this.currentUser});
+class _ProfilePageState extends State<ProfilePage>
+    implements OnProfileDetailsChange {
+  late PersonalizedUser currentUser;
 
   // Image picked by user
   File? _image;
@@ -55,28 +56,116 @@ class _ProfilePageState extends State<ProfilePage> {
       // Update in the database
       await DatabaseTools().updateUser(currentUser);
 
-      // Stop the loading dialog
-      Navigator.pop(context);
-
       setState(() {
         currentUser = currentUser;
       });
+
+      // Stop the loading dialog
+      Navigator.pop(context);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    print(currentUser.profilePicDownloadUrl);
-
-    return HomeScaffold(
-        key: UniqueKey(),
-        user: currentUser,
-        title: 'Profile',
-        home: _profileHome(),
-        drawerSelection: DrawerSelection.profile);
+  void initState() {
+    super.initState();
+    currentUser = widget.currentUser;
   }
 
-  Widget _profileHome() {
+  @override
+  void didUpdateWidget(covariant ProfilePage oldWidget) {
+    if (oldWidget.currentUser.profilePicDownloadUrl !=
+        widget.currentUser.profilePicDownloadUrl) {
+      currentUser = widget.currentUser;
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<DocumentSnapshot>(
+        stream: DatabaseTools().getUserStream(currentUser.uid),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Scaffold(
+              body: Center(
+                child: SpinKitFadingCircle(
+                  color: Colors.blue,
+                  size: 50.0,
+                ),
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            PersonalizedUser updatedUser = PersonalizedUser.fromJson(
+                snapshot.data!.data() as Map<String, dynamic>);
+
+            print(updatedUser.firstName);
+
+            return HomeScaffold(
+                key: UniqueKey(),
+                user: updatedUser,
+                title: 'Profile',
+                home: ProfilePageHome(
+                  key: UniqueKey(),
+                  currentUser: updatedUser,
+                  getImageAndUpdate: _getImageAndUpdate,
+                ),
+                drawerSelection: DrawerSelection.profile);
+          }
+
+          return Scaffold(
+            body: Center(
+              child: Text(
+                '${snapshot.error} occured',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          );
+        });
+  }
+
+  @override
+  void updatedCurrentUser(PersonalizedUser updatedCurrentUser) {
+    // TODO: implement updatedCurrentUser
+  }
+}
+
+class ProfilePageHome extends StatefulWidget {
+  final PersonalizedUser currentUser;
+  Function() getImageAndUpdate;
+
+  ProfilePageHome(
+      {Key? key, required this.currentUser, required this.getImageAndUpdate})
+      : super(key: key);
+
+  @override
+  _ProfilePageHomeState createState() => _ProfilePageHomeState();
+}
+
+class _ProfilePageHomeState extends State<ProfilePageHome> {
+  late PersonalizedUser currentUser;
+  late Function() getImageAndUpdate;
+
+  @override
+  void initState() {
+    super.initState();
+    currentUser = widget.currentUser;
+    getImageAndUpdate = widget.getImageAndUpdate;
+  }
+
+  @override
+  void didUpdateWidget(covariant ProfilePageHome oldWidget) {
+    if (currentUser != widget.currentUser) {
+      setState(() {
+        currentUser = widget.currentUser;
+      });
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
@@ -88,7 +177,7 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 InkWell(
                   // On tap is going to prompt user to choose new profile pick
-                  onTap: _getImageAndUpdate,
+                  onTap: getImageAndUpdate,
                   child: Stack(clipBehavior: Clip.hardEdge, children: [
                     getUserCircleAvatar(currentUser, 50),
                     Positioned(
@@ -213,5 +302,6 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
     );
+    ;
   }
 }

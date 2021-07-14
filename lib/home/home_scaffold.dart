@@ -30,17 +30,34 @@ class HomeScaffold extends StatefulWidget {
       required this.drawerSelection});
 
   @override
-  _HomeScaffoldState createState() =>
-      _HomeScaffoldState(user, title, home, drawerSelection);
+  _HomeScaffoldState createState() => _HomeScaffoldState();
 }
 
 class _HomeScaffoldState extends State<HomeScaffold> {
-  final user;
-  final drawerSelection;
-  final title;
-  final home;
+  late PersonalizedUser user;
+  late DrawerSelection drawerSelection;
+  late String title;
+  late Widget home;
 
-  _HomeScaffoldState(this.user, this.title, this.home, this.drawerSelection);
+  @override
+  void initState() {
+    super.initState();
+    user = widget.user;
+    drawerSelection = widget.drawerSelection;
+    title = widget.title;
+    home = widget.home;
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeScaffold oldWidget) {
+    if (user.firstName != oldWidget.user.firstName ||
+        user.lastName != widget.user.lastName) {
+      setState(() {
+        user = widget.user;
+      });
+    }
+    super.didUpdateWidget(oldWidget);
+  }
 
   @override
   Widget build(BuildContext context) {

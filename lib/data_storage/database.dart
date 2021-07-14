@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_chat_app/conversation.dart';
 import 'package:firebase_chat_app/tools/chat_app.dart';
 import 'package:firebase_chat_app/user.dart';
 import 'dart:async';
@@ -35,6 +34,13 @@ class DatabaseTools {
         .update({"profile_pic_url": user.profilePicDownloadUrl});
   }
 
+  Future updateUserFirstLastName(
+      PersonalizedUser user, String firstName, String lastName) async {
+    return await users
+        .doc(user.uid)
+        .update({"first_name": firstName, "last_name": lastName});
+  }
+
   Future<PersonalizedUser> getUser(String id) async {
     QuerySnapshot userSnapshot = await users.where('id', isEqualTo: id).get();
     late PersonalizedUser user;
@@ -45,6 +51,10 @@ class DatabaseTools {
     });
 
     return user;
+  }
+
+  Stream<DocumentSnapshot> getUserStream(String id) {
+    return users.doc(id).snapshots();
   }
 
   Future<List<PersonalizedUser>> getUsers() async {

@@ -3,9 +3,13 @@ import 'package:firebase_chat_app/auth/auth_service.dart';
 import 'package:firebase_chat_app/auth/login_page.dart';
 import 'package:firebase_chat_app/auth/register_page.dart';
 import 'package:firebase_chat_app/home/home_page.dart';
+import 'package:firebase_chat_app/main.dart';
 import 'package:firebase_chat_app/tools/chat_app.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_chat_app/config/index.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
 class ConfigPage extends StatefulWidget {
@@ -21,6 +25,28 @@ class _ConfigPageState extends State<ConfigPage> {
     super.initState();
 
     setUp();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null && !kIsWeb) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                // TODO add a proper drawable resource to android, for now using
+                //      one that already exists in example app.
+                icon: 'launch_background',
+              ),
+            ));
+      }
+    });
+    getToken();
   }
 
   void setUp() {
