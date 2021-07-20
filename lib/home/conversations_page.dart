@@ -5,9 +5,13 @@ import 'package:firebase_chat_app/home/conversation_page.dart';
 import 'package:firebase_chat_app/home/drawer_selection.dart';
 import 'package:firebase_chat_app/home/home_scaffold.dart';
 import 'package:firebase_chat_app/home/search_bar.dart';
+import 'package:firebase_chat_app/notifications/cloud_messaging.dart';
 import 'package:firebase_chat_app/tools/helper_functions.dart';
 import 'package:firebase_chat_app/user.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -25,6 +29,49 @@ class _ConversationsPageState extends State<ConversationsPage> {
   final PersonalizedUser user;
 
   _ConversationsPageState(this.user);
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Get devices token (later might add to the user on the database)
+    CloudMessagingTools().token = getToken();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null && !kIsWeb) {
+        CloudMessagingTools().flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                CloudMessagingTools().channel.id,
+                CloudMessagingTools().channel.name,
+                CloudMessagingTools().channel.description,
+                // TODO add a proper drawable resource to android, for now using
+                //      one that already exists in example app.
+                icon: 'launch_background',
+              ),
+            ));
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('A new onMessageOpenedApp event was published!');
+      // Navigator.pushNamed(context, '/message',
+      //     arguments: MessageArguments(message, true));
+    });
+  }
+
+  getToken() {
+    FirebaseMessaging.instance.getToken().then((value) {
+      CloudMessagingTools().token = value;
+      // Print the device's token
+      print("Device Token: ${CloudMessagingTools().token}");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
